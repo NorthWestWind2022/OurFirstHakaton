@@ -86,7 +86,7 @@ class Model:
         #     else:
         #         action = 0
         #     actions.append(action)
-        actions = self.model(obs)
+        actions = self.model.get_action(obs)
 
         if self.states is None:
             self.states, self.actions = obs, actions

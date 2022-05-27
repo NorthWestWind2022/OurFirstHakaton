@@ -44,7 +44,6 @@ class Critic(torch.nn.Module):
         self.trainable_layers = [self.conv, self.linear]
 
     def forward(self, state, action): #добавить action
-        action = torch.tensor(action.reshape(action.shape[1], -1))
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
@@ -126,7 +125,7 @@ class Agent:
         self.critic_optimizer.zero_grad()
         self.actor_optimizer.zero_grad()
 
-        target_actions = torch.unsqueeze(self.target_actor(new_states))
+        target_actions = torch.unsqueeze(self.target_actor(new_states), 1)
         target_critic_values = torch.squeeze(
             self.target_critic(new_states, target_actions), 1
         ).detach().cpu()

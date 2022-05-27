@@ -126,7 +126,7 @@ class Agent:
         self.critic_optimizer.zero_grad()
         self.actor_optimizer.zero_grad()
 
-        target_actions = self.target_actor(new_states)
+        target_actions = torch.unsqueeze(self.target_actor(new_states))
         target_critic_values = torch.squeeze(
             self.target_critic(new_states, target_actions), 1
         ).detach().cpu()

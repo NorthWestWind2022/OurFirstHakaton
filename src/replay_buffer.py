@@ -63,12 +63,10 @@ class ReplayBuffer:
     def add_record(
         self,
         state: np.ndarray,
-        state_rgb: np.ndarray,
         action: np.ndarray,
         reward: Union[int, float],
         next_state: np.ndarray,
-        done: bool,
-        coordinate: np.ndarray
+        done: bool
     ):
         """
         Add episode record to the buffer. If the buffer size is more than buffer capasity

@@ -24,7 +24,7 @@ class Model:
         assert self.mode in ['train', 'inference']
         self.path = ''
 
-        self.model = Agent(buffer_size=BUFFER_SIZE, actor_lr=ACTOR_LR, critic_lr=CRITIC_LR, tau=TAU)
+        self.model = Agent(buffer_size=BUFFER_SIZE, actor_lr=ACTOR_LR, critic_lr=CRITIC_LR, tau=TAU, gamma=GAMMA)
 
         if self.mode == 'inference':
             self.model.load(self.path)

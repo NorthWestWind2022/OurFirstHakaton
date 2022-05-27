@@ -60,7 +60,7 @@ class Critic(torch.nn.Module):
 
 
 class Agent:
-    def __init__(self, buffer_size, actor_lr, critic_lr, tau):
+    def __init__(self, buffer_size, actor_lr, critic_lr, tau, gamma):
         self.replay_buffer = ReplayBuffer(
                         states_shape=(3, 11, 11), actions_shape=(1,), buffer_capacity=buffer_size
                     )
@@ -68,6 +68,7 @@ class Agent:
         self.actor_lr = actor_lr
         self.critic_lr = critic_lr
         self.tau = tau
+        self.gamma = gamma
 
         self.actor = Actor(HIDDEN_SIZE)
         self.critic = Critic(HIDDEN_SIZE)

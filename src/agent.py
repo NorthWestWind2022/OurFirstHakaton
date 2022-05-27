@@ -44,10 +44,11 @@ class Critic(torch.nn.Module):
         self.trainable_layers = [self.conv, self.linear]
 
     def forward(self, state, action): #добавить action
+        action = action.to(DEVICE)
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
-        flatten_res = torch.concat([flatten_res, action], dim=1)
+        flatten_res = torch.concat([flatten_res, action], dim=1).to(DEVICE)
         q_value = self.linear(flatten_res)
         return q_value
 

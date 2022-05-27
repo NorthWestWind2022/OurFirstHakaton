@@ -1,3 +1,6 @@
+import os
+import time
+
 import numpy as np
 
 import torch
@@ -8,6 +11,23 @@ from config import DEVICE, HIDDEN_SIZE
 
 
 class Actor(torch.nn.Module):
+    @staticmethod
+    def update_coords(action, position):
+        """
+        Updates current agent's coordinates
+        """
+        x, y = position
+
+        if action == 1:
+            return x - 1, y
+        if action == 2:
+            return x + 1, y
+        if action == 3:
+            return x, y - 1
+        if action == 4:
+            return x, y + 1
+        return x, y
+
     def __init__(self, hidden_size):
         super(Actor, self).__init__()
         self.conv = torch.nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3).to(DEVICE).double()
@@ -24,7 +44,13 @@ class Actor(torch.nn.Module):
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
         probs = self.softmax(self.linear(flatten_res))
-        return torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
+        res = torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
+        x, y = self.update_coords(res, (5, 5))
+        while state[0][x, y] and res:
+            probs[res] = 0
+            res = torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
+            x, y = self.update_coords(res, (5, 5))
+        return res
 
     def get_trainable_params(self):
         weights = []
@@ -104,10 +130,31 @@ class Agent:
         return self.replay_buffer.add_record(state, action, reward, new_state, done)
 
     def save(self, path):
-        pass
+        date_now = time.strftime("%d%m%Y_%H%M")
+        if not os.path.isdir(f"{path}/saved_agent_{date_now}"):
+            os.makedirs(f"{path}/saved_agent_{date_now}")
+        self.actor.save_weights(
+            f"{path}/saved_agent_{date_now}/{self.actor.net_name}.h5"
+        )
+        self.target_actor.save_weights(
+            f"{path}/saved_agent_{date_now}/{self.target_actor.net_name}.h5"
+        )
+        self.critic.save_weights(
+            f"{path}/saved_agent_{date_now}/{self.critic.net_name}.h5"
+        )
+        self.target_critic.save_weights(
+            f"{path}/saved_agent_{date_now}/{self.target_critic.net_name}.h5"
+        )
+
+        self.replay_buffer.save(f"{path}/saved_agent_{date_now}")
 
     def load(self, path):
-        pass
+        self.actor.load_weights(f"{path}/{self.actor.net_name}.h5")
+        self.target_actor.load_weights(f"{path}/{self.target_actor.net_name}.h5")
+        self.critic.load_weights(f"{path}/{self.critic.net_name}.h5")
+        self.target_critic.load_weights(f"{path}/{self.target_critic.net_name}.h5")
+
+        self.replay_buffer.load(f"{path}")
 
     def get_action(self, state):
         state = torch.tensor(state, device=DEVICE)

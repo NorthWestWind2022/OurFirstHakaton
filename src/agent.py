@@ -4,17 +4,17 @@ import torch
 from torch.optim import AdamW
 
 from replay_buffer import ReplayBuffer
-from config import DEVICE
+from config import DEVICE, HIDDEN_SIZE
 
 
 class Actor(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, hidden_size):
         super(Actor, self).__init__()
         self.conv = torch.nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3).to(DEVICE).double()
         self.relu = torch.nn.ReLU()
-        self.pooling = torch.nn.AdaptiveMaxPool2d((2, 2)).to(DEVICE).double()
-        self.flatten = torch.nn.Flatten(0)
-        self.linear = torch.nn.Linear(4, 5).to(DEVICE).double()
+        self.pooling = torch.nn.AdaptiveMaxPool2d((16, 16)).to(DEVICE).double()
+        self.flatten = torch.nn.Flatten(1)
+        self.linear = torch.nn.Linear(hidden_size, 5).to(DEVICE).double()
         self.softmax = torch.nn.Softmax()
         self.trainable_layers = [self.conv, self.linear]
 
@@ -34,19 +34,21 @@ class Actor(torch.nn.Module):
 
 
 class Critic(torch.nn.Module):
-    def __init__(self):
+    def __init__(self, hidden_size):
         super(Critic, self).__init__()
         self.conv = torch.nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3).to(DEVICE)
         self.relu = torch.nn.ReLU()
-        self.pooling = torch.nn.AdaptiveMaxPool2d((2, 2)).to(DEVICE)
-        self.flatten = torch.nn.Flatten(0)
-        self.linear = torch.nn.Linear(4, 1).to(DEVICE)
+        self.pooling = torch.nn.AdaptiveMaxPool2d((16, 16)).to(DEVICE)
+        self.flatten = torch.nn.Flatten(1)
+        self.linear = torch.nn.Linear(hidden_size + 1, 1).to(DEVICE)
         self.trainable_layers = [self.conv, self.linear]
 
     def forward(self, state, action): #добавить action
+        action = torch.tensor(action.reshape(action.shape[1], -1))
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
+        flatten_res = torch.concat([flatten_res, action], dim=1)
         q_value = self.linear(flatten_res)
         return q_value
 
@@ -64,14 +66,14 @@ class Agent:
                     )
 
         self.actor_lr = actor_lr
-        self.critic_rl = critic_lr
+        self.critic_lr = critic_lr
         self.tau = tau
 
-        self.actor = Actor()
-        self.critic = Critic()
+        self.actor = Actor(HIDDEN_SIZE)
+        self.critic = Critic(HIDDEN_SIZE)
 
-        self.target_actor = Actor()
-        self.target_critic = Critic()
+        self.target_actor = Actor(HIDDEN_SIZE)
+        self.target_critic = Critic(HIDDEN_SIZE)
 
         self.target_actor.load_state_dict(self.actor.state_dict())
         self.target_critic.load_state_dict(self.critic.state_dict())

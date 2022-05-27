@@ -75,17 +75,18 @@ class Model:
         """
         Given current observations, Done flags, agents' current positions and their targets, produce actions for agents.
         """
-        actions = []
-        updated_states = copy.deepcopy(obs)
-        for i in range(len(obs)):
-            if not dones[i]:
-                action, updated_states_tmp, new_position = self.update_state(updated_states[i], positions_xy[i],
-                                                                             targets_xy[i], updated_states[i::],
-                                                                             positions_xy[i::])
-                updated_states = updated_states[0:i + 1] + updated_states_tmp
-            else:
-                action = 0
-            actions.append(action)
+        # actions = []
+        # updated_states = copy.deepcopy(obs)
+        # for i in range(len(obs)):
+        #     if not dones[i]:
+        #         action, updated_states_tmp, new_position = self.update_state(updated_states[i], positions_xy[i],
+        #                                                                      targets_xy[i], updated_states[i::],
+        #                                                                      positions_xy[i::])
+        #         updated_states = updated_states[0:i + 1] + updated_states_tmp
+        #     else:
+        #         action = 0
+        #     actions.append(action)
+        actions = self.model(obs)
 
         if self.states is None:
             self.states, self.actions = obs, actions

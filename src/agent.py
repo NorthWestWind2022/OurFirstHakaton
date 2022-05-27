@@ -139,7 +139,7 @@ class Agent:
         critic_loss.backward()
         self.critic_optimizer.step()
 
-        policy_actions = self.actor(states)
+        policy_actions = torch.unsqueeze(self.actor(states), 1)
         actor_loss = -self.critic(states, policy_actions)
         actor_loss = torch.mean(actor_loss)
 

@@ -146,4 +146,4 @@ class Agent:
         actor_loss.backward()
         self.actor_optimizer.step()
 
-        self.update_target_networks_yolo(self.tau)
+        self.update_target_networks(self.tau)

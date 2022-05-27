@@ -24,7 +24,7 @@ class Actor(torch.nn.Module):
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
         probs = self.softmax(self.linear(flatten_res))
-        return np.argmax(probs.detach().cpu().numpy())
+        return np.argmax(probs.detach().cpu().numpy(), axis=1)
 
     def get_trainable_params(self):
         weights = []

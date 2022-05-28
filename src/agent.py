@@ -162,12 +162,11 @@ class Agent:
 
         self.replay_buffer.save(folder)
 
-
-    def load(self, path):
-        self.actor.load_state_dict(torch.load(f'{path}/{self.actor.net_name}.pkl'))
-        self.target_actor.load_state_dict(torch.load(f'{path}/{self.target_actor.net_name}.pkl'))
-        self.critic.load_state_dict(torch.load(f'{path}/{self.critic.net_name}.pkl'))
-        self.target_critic.load_state_dict(torch.load(f'{path}/{self.target_critic.net_name}.pkl'))
+    def load(self, path, map_location):
+        self.actor.load_state_dict(torch.load(f'{path}/{self.actor.net_name}.pkl', map_location=map_location))
+        self.target_actor.load_state_dict(torch.load(f'{path}/{self.target_actor.net_name}.pkl', map_location=map_location))
+        self.critic.load_state_dict(torch.load(f'{path}/{self.critic.net_name}.pkl', map_location=map_location))
+        self.target_critic.load_state_dict(torch.load(f'{path}/{self.target_critic.net_name}.pkl', map_location=map_location))
 
         # self.replay_buffer.load(f"{path}")
 

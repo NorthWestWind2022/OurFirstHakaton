@@ -1,3 +1,4 @@
+import copy
 import os
 import subprocess
 import time
@@ -29,16 +30,14 @@ class Actor(torch.nn.Module):
             return x, y + 1
         return x, y
 
-    def update(self, probs):
+    def update(self, probs, obstacles):
         print(probs)
-        print(self.obstacles[self.i])
         action = torch.tensor(np.argmax(probs))
         x, y = self.update_coords(action, (5, 5))
-        while self.obstacles[self.i][0][x, y] and action:
+        while obstacles[0][x, y] and action:
             probs[action] = 0
             action = torch.tensor(np.argmax(probs))
             x, y = self.update_coords(action, (5, 5))
-        self.i += 1
         return action
 
     def __init__(self, name, hidden_size):
@@ -51,24 +50,21 @@ class Actor(torch.nn.Module):
         self.linear = torch.nn.Linear(hidden_size, 5).to(DEVICE).double()
         self.softmax = torch.nn.Softmax()
         self.trainable_layers = [self.conv, self.linear]
-        self.vupdate = np.vectorize(self.update)
-        self.obstacles = None
-        self.i = 0
 
     def forward(self, state):
         state = state.double()
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
-        probs = self.softmax(self.linear(flatten_res)).detach().cpu()
+        probs = self.softmax(self.linear(flatten_res)).detach().cpu().numpy()
         state = state.detach().cpu()
         # print(probs.get_device())
         # print(state.get_device())
-        self.obstacles = state
-        print(probs)
-        res = self.vupdate(probs.detach().cpu().numpy())
-        self.i = 0
-        return res
+        res = np.zeros(len(state))
+        for i, prob in enumerate(probs):
+            res[i] = self.update(probs[i], state[i])
+
+        return torch.tensor(res)
 
     def get_trainable_params(self):
         weights = []

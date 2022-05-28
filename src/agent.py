@@ -71,7 +71,7 @@ class Critic(torch.nn.Module):
     def forward(self, state, action): #добавить action
         action = action.to(DEVICE)
         resnet_res = self.resnet(state)
-        concat_res = torch.concat([resnet_res, action], dim=1).to(DEVICE).float()
+        concat_res = torch.concat([resnet_res, action], dim=1).to(DEVICE).double()
         q_value = self.linear(concat_res)
         return q_value
 

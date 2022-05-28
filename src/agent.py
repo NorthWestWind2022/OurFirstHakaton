@@ -168,7 +168,7 @@ class Agent:
 
 
     def get_action(self, state):
-        state = torch.tensor(state, device=DEVICE)
+        state = torch.tensor(state)
         return self.actor(state)
 
     def train(self):

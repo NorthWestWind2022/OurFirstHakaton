@@ -75,6 +75,8 @@ class Model:
 
     @staticmethod
     def manhattan(a, b):
+        print(a)
+        print(b)
         return sum(abs(val1 - val2) for val1, val2 in zip(a, b))
 
     def get_reward(self, position, new_position, target, done):

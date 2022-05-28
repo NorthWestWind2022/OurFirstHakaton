@@ -30,6 +30,7 @@ class Actor(torch.nn.Module):
         return x, y
 
     def update(self, probs):
+        print(probs)
         print(self.obstacles[self.i])
         action = torch.tensor(np.argmax(probs))
         x, y = self.update_coords(action, (5, 5))

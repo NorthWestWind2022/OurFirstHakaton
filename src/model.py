@@ -84,10 +84,9 @@ class Model:
             return 100
         distance = self.manhattan(position, target)
         new_distance = self.manhattan(new_position, target)
-        print('New pos is:', new_position)
-        print('Hist is:', hist)
+
         if new_position in hist:
-            return -2
+            return -20
         if new_distance < distance:
             return 1
         if new_distance == distance:

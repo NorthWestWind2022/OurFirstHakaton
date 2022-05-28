@@ -29,6 +29,15 @@ class Actor(torch.nn.Module):
             return x, y + 1
         return x, y
 
+    def update(self, probs, obstacle):
+        action = torch.tensor(np.argmax(probs.detach().cpu().numpy()))
+        x, y = self.update_coords(action, (5, 5))
+        while obstacle[0][x, y] and action:
+            probs[action] = 0
+            action = torch.tensor(np.argmax(probs.detach().cpu().numpy()))
+            x, y = self.update_coords(action, (5, 5))
+        return action
+
     def __init__(self, name, hidden_size):
         super(Actor, self).__init__()
         self.net_name = name
@@ -39,6 +48,7 @@ class Actor(torch.nn.Module):
         self.linear = torch.nn.Linear(hidden_size, 5).to(DEVICE).double()
         self.softmax = torch.nn.Softmax()
         self.trainable_layers = [self.conv, self.linear]
+        self.vupdate = np.vectorize(self.update)
 
     def forward(self, state):
         state = state.double()
@@ -46,13 +56,7 @@ class Actor(torch.nn.Module):
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
         probs = self.softmax(self.linear(flatten_res))
-        res = torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
-        # x, y = self.update_coords(res, (5, 5))
-        # while state[0][x, y] and res:
-        #     probs[res] = 0
-        #     res = torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
-        #     x, y = self.update_coords(res, (5, 5))
-        return res
+        return self.vupdate(probs, state)
 
     def get_trainable_params(self):
         weights = []

@@ -85,9 +85,13 @@ class Model:
             self.agents[k].update_obstacles(obs[k][0], obs[k][1], (positions_xy[k][0] - 5, positions_xy[k][1] - 5))
             self.agents[k].compute_shortest_path(start=positions_xy[k], goal=targets_xy[k])
             next_node = self.agents[k].get_next_node()
-            if next_node in self.agents[k].footprint[-4::]:
+            action = self.actions[(next_node[0] - positions_xy[k][0], next_node[1] - positions_xy[k][1])]
+            if next_node in self.agents[k].footprint[-8::]:
                 actions.append(rl_res[k])
             else:
-                actions.append(self.actions[(next_node[0] - positions_xy[k][0], next_node[1] - positions_xy[k][1])])
+                if action != rl_res[k]:
+                    actions.append(np.random.choice([action, rl_res[k]]))
+                else:
+                    actions.append(action)
             self.agents[k].footprint.append(next_node)
         return actions

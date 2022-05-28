@@ -39,31 +39,18 @@ class Actor(torch.nn.Module):
             x, y = self.update_coords(action, (5, 5))
         return action
 
-    def __init__(self, name, hidden_size):
+    def __init__(self, name):
         super(Actor, self).__init__()
         self.net_name = name
-        self.conv = torch.nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3).to(DEVICE).double()
-        self.relu = torch.nn.ReLU()
-        self.pooling = torch.nn.AdaptiveMaxPool2d((16, 16)).to(DEVICE).double()
-        self.flatten = torch.nn.Flatten(1)
-        self.linear = torch.nn.Linear(hidden_size, 5).to(DEVICE).double()
-        self.softmax = torch.nn.Softmax()
-        self.trainable_layers = [self.conv, self.linear]
+        self.resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True).to(DEVICE).double()
+        self.linear = torch.nn.Linear(1000, 5).to(DEVICE).double()
+        self.output = torch.nn.Softmax()
+        self.trainable_layers = [self.linear]
 
     def forward(self, state):
-        state = state.double()
-        conv_res = self.relu(self.conv(state))
-        pool_res = self.pooling(conv_res)
-        flatten_res = self.flatten(pool_res)
-        probs = self.softmax(self.linear(flatten_res)).detach().cpu().numpy()
-        state = state.detach().cpu()
-        # print(probs.get_device())
-        # print(state.get_device())
-        res = np.zeros(len(state))
-        for i, prob in enumerate(probs):
-            res[i] = self.update(probs[i], state[i])
-
-        return torch.tensor(res)
+        resnet_output = self.resnet(state)
+        probs = self.output(self.linear(resnet_output))
+        return torch.tensor(np.argmax(probs))
 
     def get_trainable_params(self):
         weights = []
@@ -73,23 +60,18 @@ class Actor(torch.nn.Module):
 
 
 class Critic(torch.nn.Module):
-    def __init__(self, name, hidden_size):
+    def __init__(self, name):
         super(Critic, self).__init__()
         self.net_name = name
-        self.conv = torch.nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3).to(DEVICE)
-        self.relu = torch.nn.ReLU()
-        self.pooling = torch.nn.AdaptiveMaxPool2d((16, 16)).to(DEVICE)
-        self.flatten = torch.nn.Flatten(1)
-        self.linear = torch.nn.Linear(hidden_size + 1, 1).to(DEVICE)
-        self.trainable_layers = [self.conv, self.linear]
+        self.resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True).to(DEVICE).double()
+        self.linear = torch.nn.Linear(1001, 1).to(DEVICE).double()
+        self.trainable_layers = [self.linear]
 
     def forward(self, state, action): #добавить action
         action = action.to(DEVICE)
-        conv_res = self.relu(self.conv(state))
-        pool_res = self.pooling(conv_res)
-        flatten_res = self.flatten(pool_res)
-        flatten_res = torch.concat([flatten_res, action], dim=1).to(DEVICE).float()
-        q_value = self.linear(flatten_res)
+        resnet_res = self.resnet(state)
+        concat_res = torch.concat([resnet_res, action], dim=1).to(DEVICE).float()
+        q_value = self.linear(concat_res)
         return q_value
 
     def get_trainable_params(self):
@@ -110,11 +92,11 @@ class Agent:
         self.tau = tau
         self.gamma = gamma
 
-        self.actor = Actor('actor', HIDDEN_SIZE)
-        self.critic = Critic('critic', HIDDEN_SIZE)
+        self.actor = Actor('actor')
+        self.critic = Critic('critic')
 
-        self.target_actor = Actor('target_actor', HIDDEN_SIZE)
-        self.target_critic = Critic('target_critic', HIDDEN_SIZE)
+        self.target_actor = Actor('target_actor')
+        self.target_critic = Critic('target_critic')
 
         self.target_actor.load_state_dict(self.actor.state_dict())
         self.target_critic.load_state_dict(self.critic.state_dict())

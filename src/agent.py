@@ -49,7 +49,7 @@ class Actor(torch.nn.Module):
 
     def forward(self, state):
         resnet_output = self.resnet(state)
-        probs = self.output(self.linear(resnet_output))
+        probs = self.output(self.linear(resnet_output)).detach().numpy()
         return torch.tensor(np.argmax(probs))
 
     def get_trainable_params(self):

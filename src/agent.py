@@ -164,8 +164,8 @@ class Agent:
 
         state, action, reward, new_state, done = self.replay_buffer.get_minibatch()
 
-        states = torch.tensor(state, dtype=torch.float32, device=DEVICE)
-        new_states = torch.tensor(new_state, dtype=torch.float32, device=DEVICE)
+        states = torch.tensor(state, dtype=torch.float32, device=DEVICE).double()
+        new_states = torch.tensor(new_state, dtype=torch.float32, device=DEVICE).double()
         rewards = torch.tensor(reward, dtype=torch.float32, device=DEVICE)
         actions = torch.tensor(action, dtype=torch.float32, device=DEVICE)
 

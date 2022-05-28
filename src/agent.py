@@ -45,11 +45,11 @@ class Actor(torch.nn.Module):
         flatten_res = self.flatten(pool_res)
         probs = self.softmax(self.linear(flatten_res))
         res = torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
-        x, y = self.update_coords(res, (5, 5))
-        while state[0][x, y] and res:
-            probs[res] = 0
-            res = torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
-            x, y = self.update_coords(res, (5, 5))
+        # x, y = self.update_coords(res, (5, 5))
+        # while state[0][x, y] and res:
+        #     probs[res] = 0
+        #     res = torch.tensor(np.argmax(probs.detach().cpu().numpy(), axis=1))
+        #     x, y = self.update_coords(res, (5, 5))
         return res
 
     def get_trainable_params(self):

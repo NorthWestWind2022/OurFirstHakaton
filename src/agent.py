@@ -51,7 +51,7 @@ class Actor(torch.nn.Module):
         self.vupdate = np.vectorize(self.update)
 
     def forward(self, state):
-        state = state.double().detach().cpu()
+        state = state.double()
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)

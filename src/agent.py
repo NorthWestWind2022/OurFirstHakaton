@@ -29,10 +29,11 @@ class Actor(torch.nn.Module):
             return x, y + 1
         return x, y
 
-    def update(self, probs):
+    def update(self, probs, obstacles):
+        print('Obstacle size:', obstacles.size())
         action = torch.tensor(np.argmax(probs))
         x, y = self.update_coords(action, (5, 5))
-        while self.obstacles[x, y] and action:
+        while obstacles[0][x, y] and action:
             probs[action] = 0
             action = torch.tensor(np.argmax(probs.detach().cpu().numpy()))
             x, y = self.update_coords(action, (5, 5))
@@ -61,8 +62,7 @@ class Actor(torch.nn.Module):
         state = state.detach().cpu()
         print(probs.get_device())
         print(state.get_device())
-        self.obstacles = state[0]
-        return self.vupdate(probs)
+        return self.vupdate(probs, state)
 
     def get_trainable_params(self):
         weights = []

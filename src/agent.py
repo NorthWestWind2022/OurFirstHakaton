@@ -56,6 +56,7 @@ class Actor(torch.nn.Module):
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
         probs = self.softmax(self.linear(flatten_res)).detach().cpu()
+        state = state.detach().cpu()
         print(probs.get_device())
         print(state.get_device())
         return self.vupdate(probs, state)
@@ -168,7 +169,7 @@ class Agent:
 
 
     def get_action(self, state):
-        state = torch.tensor(state)
+        state = torch.tensor(state, device=DEVICE)
         return self.actor(state)
 
     def train(self):

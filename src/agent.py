@@ -52,7 +52,7 @@ class Actor(torch.nn.Module):
         print('ResNet output:', resnet_output.size())
         probs = self.output(self.linear(resnet_output))
         print('Probs size:', probs.size())
-        return torch.tensor(np.argmax(probs))
+        return torch.tensor(np.argmax(probs, axis=1))
 
     def get_trainable_params(self):
         weights = []

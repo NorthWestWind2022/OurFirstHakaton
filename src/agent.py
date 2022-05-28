@@ -88,7 +88,7 @@ class Critic(torch.nn.Module):
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
-        flatten_res = torch.concat([flatten_res, action], dim=1).to(DEVICE)
+        flatten_res = torch.concat([flatten_res, action], dim=1).to(DEVICE).float()
         q_value = self.linear(flatten_res)
         return q_value
 

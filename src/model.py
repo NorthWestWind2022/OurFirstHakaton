@@ -24,7 +24,7 @@ class Model:
         self.position_hist = []
         self.mode = 'inference'
         assert self.mode in ['train', 'inference']
-        self.path = 'OurFirstHakaton/src/trained_models'
+        self.path = './gdrive/MyDrive/trained_models/saved_agent_28052022_0933'
 
         self.model = Agent(buffer_size=BUFFER_SIZE, actor_lr=ACTOR_LR, critic_lr=CRITIC_LR, tau=TAU, gamma=GAMMA)
 

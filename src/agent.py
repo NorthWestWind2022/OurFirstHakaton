@@ -164,10 +164,10 @@ class Agent:
 
 
     def load(self, path):
-        self.actor.load_state_dict(torch.load(f'{path}/{self.actor.net_name}.pkl'))
-        self.target_actor.load_state_dict(torch.load(f'{path}/{self.target_actor.net_name}.pkl'))
-        self.critic.load_state_dict(torch.load(f'{path}/{self.critic.net_name}.pkl'))
-        self.target_critic.load_state_dict(torch.load(f'{path}/{self.target_critic.net_name}.pkl'))
+        self.actor.load_state_dict(torch.load(f'{path}/{self.actor.net_name}'))
+        self.target_actor.load_state_dict(torch.load(f'{path}/{self.target_actor.net_name}'))
+        self.critic.load_state_dict(torch.load(f'{path}/{self.critic.net_name}'))
+        self.target_critic.load_state_dict(torch.load(f'{path}/{self.target_critic.net_name}'))
 
         # self.replay_buffer.load(f"{path}")
 
@@ -210,3 +210,4 @@ class Agent:
         self.actor_optimizer.step()
 
         self.update_target_networks(self.tau)
+

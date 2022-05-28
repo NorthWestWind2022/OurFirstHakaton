@@ -21,6 +21,7 @@ class Model:
         """
         self.states, self.actions = None, None
         self.positions_xy = None
+        self.position_hist = []
         self.mode = 'train'
         assert self.mode in ['train', 'inference']
         self.path = ''
@@ -77,10 +78,16 @@ class Model:
         return sum(abs(val1 - val2) for val1, val2 in zip(a, b))
 
     def get_reward(self, position, new_position, target, done):
+        hist = np.array(self.position_hist)
+        hist = hist.reshape(hist.shape[1], hist.shape[2], -1)
         if done:
             return 100
         distance = self.manhattan(position, target)
         new_distance = self.manhattan(new_position, target)
+        print('New pos is:', new_position)
+        print('Hist is:', hist)
+        if new_position in hist:
+            return -2
         if new_distance < distance:
             return 1
         if new_distance == distance:
@@ -107,6 +114,7 @@ class Model:
         if self.states is None:
             self.states, self.actions = obs, actions
             self.positions_xy = positions_xy
+            self.position_hist.append(np.array(positions_xy))
         else:
             rewards = np.array([self.get_reward(self.positions_xy[i], positions_xy[i], targets_xy[i], dones[i])
                                 for i in range(len(dones))])

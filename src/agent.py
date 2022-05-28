@@ -1,4 +1,5 @@
 import os
+import subprocess
 import time
 
 import numpy as np
@@ -131,30 +132,32 @@ class Agent:
 
     def save(self, path):
         date_now = time.strftime("%d%m%Y_%H%M")
-        if not os.path.isdir(f"{path}/saved_agent_{date_now}"):
-            os.makedirs(f"{path}/saved_agent_{date_now}")
-        self.actor.save_weights(
-            f"{path}/saved_agent_{date_now}/{self.actor.net_name}.h5"
-        )
-        self.target_actor.save_weights(
-            f"{path}/saved_agent_{date_now}/{self.target_actor.net_name}.h5"
-        )
-        self.critic.save_weights(
-            f"{path}/saved_agent_{date_now}/{self.critic.net_name}.h5"
-        )
-        self.target_critic.save_weights(
-            f"{path}/saved_agent_{date_now}/{self.target_critic.net_name}.h5"
-        )
+        folder = path + f'/saved_agent_{date_now}'
+        subprocess.run(['mkdir', folder])
 
-        self.replay_buffer.save(f"{path}/saved_agent_{date_now}")
+        with open(f"{folder}/{self.actor.net_name}.pkl", 'wb') as file:
+            torch.save(self.actor.state_dict(), file)
+
+        with open(f"{folder}/{self.target_actor.net_name}.pkl", 'wb') as file:
+            torch.save(self.target_actor.state_dict(), file)
+
+        with open(f"{folder}/{self.critic.net_name}.pkl", 'wb') as file:
+            torch.save(self.critic.state_dict(), file)
+
+        with open(f"{folder}/{self.target_critic.net_name}.pkl", 'wb') as file:
+            torch.save(self.target_critic.state_dict(), file)
+
+        self.replay_buffer.save(folder)
+
 
     def load(self, path):
-        self.actor.load_weights(f"{path}/{self.actor.net_name}.h5")
-        self.target_actor.load_weights(f"{path}/{self.target_actor.net_name}.h5")
-        self.critic.load_weights(f"{path}/{self.critic.net_name}.h5")
-        self.target_critic.load_weights(f"{path}/{self.target_critic.net_name}.h5")
+        self.actor.load_state_dict(torch.load(f'{path}/{self.actor.net_name}.pkl'))
+        self.target_actor.load_state_dict(torch.load(f'{path}/{self.target_actor.net_name}.pkl'))
+        self.critic.load_state_dict(torch.load(f'{path}/{self.critic.net_name}.pkl'))
+        self.target_critic.load_state_dict(torch.load(f'{path}/{self.target_critic.net_name}.pkl'))
 
         self.replay_buffer.load(f"{path}")
+
 
     def get_action(self, state):
         state = torch.tensor(state, device=DEVICE)

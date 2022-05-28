@@ -29,8 +29,9 @@ class Actor(torch.nn.Module):
             return x, y + 1
         return x, y
 
-    def __init__(self, hidden_size):
+    def __init__(self, name, hidden_size):
         super(Actor, self).__init__()
+        self.net_name = name
         self.conv = torch.nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3).to(DEVICE).double()
         self.relu = torch.nn.ReLU()
         self.pooling = torch.nn.AdaptiveMaxPool2d((16, 16)).to(DEVICE).double()
@@ -61,8 +62,9 @@ class Actor(torch.nn.Module):
 
 
 class Critic(torch.nn.Module):
-    def __init__(self, hidden_size):
+    def __init__(self, name, hidden_size):
         super(Critic, self).__init__()
+        self.net_name = name
         self.conv = torch.nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3).to(DEVICE)
         self.relu = torch.nn.ReLU()
         self.pooling = torch.nn.AdaptiveMaxPool2d((16, 16)).to(DEVICE)
@@ -97,11 +99,11 @@ class Agent:
         self.tau = tau
         self.gamma = gamma
 
-        self.actor = Actor(HIDDEN_SIZE)
-        self.critic = Critic(HIDDEN_SIZE)
+        self.actor = Actor('actor', HIDDEN_SIZE)
+        self.critic = Critic('critic', HIDDEN_SIZE)
 
-        self.target_actor = Actor(HIDDEN_SIZE)
-        self.target_critic = Critic(HIDDEN_SIZE)
+        self.target_actor = Actor('target_actor', HIDDEN_SIZE)
+        self.target_critic = Critic('target_critic', HIDDEN_SIZE)
 
         self.target_actor.load_state_dict(self.actor.state_dict())
         self.target_critic.load_state_dict(self.critic.state_dict())

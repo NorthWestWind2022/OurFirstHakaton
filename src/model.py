@@ -22,7 +22,7 @@ class Model:
         self.states, self.actions = None, None
         self.positions_xy = None
         self.position_hist = []
-        self.mode = 'inference'
+        self.mode = 'train'
         assert self.mode in ['train', 'inference']
         self.path = './trained_models/saved_agent_28052022_0933'
 

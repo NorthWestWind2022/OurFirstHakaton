@@ -97,4 +97,4 @@ class Model:
             self.model.train()
             self.states = obs
 
-        return actions
+        return actions.detach().cpu().numpy()

@@ -51,11 +51,11 @@ class Actor(torch.nn.Module):
         self.vupdate = np.vectorize(self.update)
 
     def forward(self, state):
-        state = state.double().to(DEVICE)
+        state = state.double()
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
-        probs = self.softmax(self.linear(flatten_res)).to(DEVICE)
+        probs = self.softmax(self.linear(flatten_res)).detach().cpu()
         return self.vupdate(probs, state)
 
     def get_trainable_params(self):

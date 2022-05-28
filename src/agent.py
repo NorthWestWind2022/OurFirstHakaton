@@ -65,6 +65,7 @@ class Actor(torch.nn.Module):
         # print(probs.get_device())
         # print(state.get_device())
         self.obstacles = state
+        print(probs)
         res = self.vupdate(probs.detach().cpu().numpy())
         self.i = 0
         return res

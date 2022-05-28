@@ -20,7 +20,9 @@ class Model:
         This should handle the logic of your model initialization like loading weights, setting constants, etc.
         """
         self.states, self.actions = None, None
+        self.positions_xy = None
         self.mode = 'train'
+        self.reward_func = np.vectorize(self.reward_func)
         assert self.mode in ['train', 'inference']
         self.path = ''
 
@@ -71,6 +73,21 @@ class Model:
             return action, updated_states, new_pos
         return action, other_states, position
 
+    @staticmethod
+    def manhattan(a, b):
+        return sum(abs(val1 - val2) for val1, val2 in zip(a, b))
+
+    def get_reward(self, position, new_position, target, done):
+        if done:
+            return 100
+        distance = self.manhattan(position, target)
+        new_distance = self.manhattan(new_position, target)
+        if new_distance < distance:
+            return 1
+        if new_distance == distance:
+            return -1
+        return -2
+
     def act(self, obs, dones, positions_xy, targets_xy) -> list:
         """
         Given current observations, Done flags, agents' current positions and their targets, produce actions for agents.
@@ -90,8 +107,10 @@ class Model:
 
         if self.states is None:
             self.states, self.actions = obs, actions
+            self.positions_xy = positions_xy
         else:
-            rewards = np.array([1 if elem else 0 for elem in dones])
+            rewards = self.reward_func(self.positions_xy, positions_xy, targets_xy, dones)
+            print('Rewards are:', rewards)
             for i in range(len(obs)):
                 self.model.add_to_replay_buffer(self.states[i], self.actions[i], rewards[i], obs[i], dones[i])
             self.model.train()

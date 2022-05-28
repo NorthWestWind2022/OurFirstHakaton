@@ -169,7 +169,7 @@ class Agent:
         self.critic.load_state_dict(torch.load(f'{path}/{self.critic.net_name}.pkl'))
         self.target_critic.load_state_dict(torch.load(f'{path}/{self.target_critic.net_name}.pkl'))
 
-        self.replay_buffer.load(f"{path}")
+        # self.replay_buffer.load(f"{path}")
 
 
     def get_action(self, state):

@@ -24,7 +24,7 @@ class Model:
         self.position_hist = []
         self.mode = 'inference'
         assert self.mode in ['train', 'inference']
-        self.path = 'trained_models'
+        self.path = 'OurFirstHakaton/src/trained_models'
 
         self.model = Agent(buffer_size=BUFFER_SIZE, actor_lr=ACTOR_LR, critic_lr=CRITIC_LR, tau=TAU, gamma=GAMMA)
 

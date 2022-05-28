@@ -178,8 +178,8 @@ class Agent:
         critic_value = torch.squeeze(self.critic(states, actions), 1)
         target = rewards + torch.tensor(self.gamma * target_critic_values * (1 - done),
                                         dtype=torch.float32, device=DEVICE)
-        critic_loss = self.critic_loss(critic_value, target)
-        print(critic_loss.dtype)
+        critic_loss = self.critic_loss(critic_value, target).double()
+
         critic_loss.backward()
         self.critic_optimizer.step()
 

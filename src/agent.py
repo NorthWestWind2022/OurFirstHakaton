@@ -73,7 +73,7 @@ class Critic(torch.nn.Module):
         resnet_res = self.resnet(state)
         concat_res = torch.concat([resnet_res, action], dim=1).to(DEVICE).double()
         q_value = self.linear(concat_res)
-        return q_value
+        return q_value.double()
 
     def get_trainable_params(self):
         weights = []

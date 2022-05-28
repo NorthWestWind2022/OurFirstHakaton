@@ -60,8 +60,8 @@ class Actor(torch.nn.Module):
         flatten_res = self.flatten(pool_res)
         probs = self.softmax(self.linear(flatten_res)).detach().cpu()
         state = state.detach().cpu().numpy()
-        print(probs.get_device())
-        print(state.get_device())
+        # print(probs.get_device())
+        # print(state.get_device())
         return self.vupdate(probs, state)
 
     def get_trainable_params(self):

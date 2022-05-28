@@ -30,7 +30,7 @@ class Actor(torch.nn.Module):
         return x, y
 
     def update(self, probs, obstacles):
-        print('Obstacle size:', obstacles.size())
+        print('Obstacle size:', obstacles.shape)
         action = torch.tensor(np.argmax(probs))
         x, y = self.update_coords(action, (5, 5))
         while obstacles[0][x, y] and action:
@@ -59,7 +59,7 @@ class Actor(torch.nn.Module):
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
         probs = self.softmax(self.linear(flatten_res)).detach().cpu()
-        state = state.detach().cpu()
+        state = state.detach().cpu().numpy()
         print(probs.get_device())
         print(state.get_device())
         return self.vupdate(probs, state)

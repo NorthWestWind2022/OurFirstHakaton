@@ -151,12 +151,10 @@ class ReplayBuffer:
             os.mkdir(folder_name)
 
         np.save(os.path.join(folder_name, "states.npy"), self.states)
-        np.save(os.path.join(folder_name, "states_rgb.npy"), self.states)
         np.save(os.path.join(folder_name, "actions.npy"), self.actions)
         np.save(os.path.join(folder_name, "rewards.npy"), self.rewards)
         np.save(os.path.join(folder_name, "next_states.npy"), self.next_states)
         np.save(os.path.join(folder_name, "dones.npy"), self.dones)
-        np.save(os.path.join(folder_name, "coordinates.npy"), self.coordinates)
 
         dict_info = {"buffer_counter": self.buffer_counter, "n_games": self.n_games}
         with open(os.path.join(folder_name, "dict_info.json"), "w") as f:
@@ -170,12 +168,10 @@ class ReplayBuffer:
         :type folder_name: str
         """
         self.states = np.load(os.path.join(folder_name, "states.npy"))
-        self.states_rgb = np.load(os.path.join(folder_name, "states_rgb.npy"))
         self.actions = np.load(os.path.join(folder_name, "actions.npy"))
         self.rewards = np.load(os.path.join(folder_name, "rewards.npy"))
         self.next_states = np.load(os.path.join(folder_name, "next_states.npy"))
         self.dones = np.load(os.path.join(folder_name, "dones.npy"))
-        self.coordinates = np.load(os.path.join(folder_name, "coordinates.npy"))
 
         with open(os.path.join(folder_name, "dict_info.json"), "r") as f:
             dict_info = json.load(f)

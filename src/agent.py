@@ -55,7 +55,7 @@ class Actor(torch.nn.Module):
         conv_res = self.relu(self.conv(state))
         pool_res = self.pooling(conv_res)
         flatten_res = self.flatten(pool_res)
-        probs = self.softmax(self.linear(flatten_res))
+        probs = self.softmax(self.linear(flatten_res)).to(DEVICE)
         return self.vupdate(probs, state)
 
     def get_trainable_params(self):

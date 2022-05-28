@@ -153,7 +153,6 @@ class Agent:
 
         # self.replay_buffer.load(f"{path}")
 
-
     def get_action(self, state):
         state = torch.tensor(state, device=DEVICE)
         return self.actor(state)
@@ -180,7 +179,7 @@ class Agent:
         target = rewards + torch.tensor(self.gamma * target_critic_values * (1 - done),
                                         dtype=torch.float32, device=DEVICE)
         critic_loss = self.critic_loss(critic_value, target)
-
+        print(critic_loss.dtype)
         critic_loss.backward()
         self.critic_optimizer.step()
 

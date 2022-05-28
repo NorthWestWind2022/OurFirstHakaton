@@ -22,7 +22,6 @@ class Model:
         self.states, self.actions = None, None
         self.positions_xy = None
         self.mode = 'train'
-        self.reward_func = np.vectorize(self.get_reward)
         assert self.mode in ['train', 'inference']
         self.path = ''
 
@@ -75,8 +74,6 @@ class Model:
 
     @staticmethod
     def manhattan(a, b):
-        print(a)
-        print(b)
         return sum(abs(val1 - val2) for val1, val2 in zip(a, b))
 
     def get_reward(self, position, new_position, target, done):
@@ -111,7 +108,8 @@ class Model:
             self.states, self.actions = obs, actions
             self.positions_xy = positions_xy
         else:
-            rewards = self.reward_func(self.positions_xy, positions_xy, targets_xy, dones)
+            rewards = np.array([self.get_reward(self.positions_xy[i], positions_xy[i], targets_xy[i], dones[i])
+                                for i in range(len(dones))])
             print('Rewards are:', rewards)
             for i in range(len(obs)):
                 self.model.add_to_replay_buffer(self.states[i], self.actions[i], rewards[i], obs[i], dones[i])

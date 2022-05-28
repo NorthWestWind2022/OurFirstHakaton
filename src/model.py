@@ -22,7 +22,7 @@ class Model:
         self.states, self.actions = None, None
         self.positions_xy = None
         self.position_hist = []
-        self.mode = 'train'
+        self.mode = 'inference'
         assert self.mode in ['train', 'inference']
         self.path = ''
 
@@ -110,17 +110,18 @@ class Model:
         #     actions.append(action)
         actions = self.model.get_action(obs)
 
-        if self.states is None:
-            self.states, self.actions = obs, actions
-            self.positions_xy = positions_xy
-            self.position_hist.append(np.array(positions_xy))
-        else:
-            rewards = np.array([self.get_reward(self.positions_xy[i], positions_xy[i], targets_xy[i], dones[i])
-                                for i in range(len(dones))])
-            print('Rewards are:', rewards)
-            for i in range(len(obs)):
-                self.model.add_to_replay_buffer(self.states[i], self.actions[i], rewards[i], obs[i], dones[i])
-            self.model.train()
-            self.states = obs
+        if self.mode == 'train':
+            if self.states is None:
+                self.states, self.actions = obs, actions
+                self.positions_xy = positions_xy
+                self.position_hist.append(np.array(positions_xy))
+            else:
+                rewards = np.array([self.get_reward(self.positions_xy[i], positions_xy[i], targets_xy[i], dones[i])
+                                    for i in range(len(dones))])
+                print('Rewards are:', rewards)
+                for i in range(len(obs)):
+                    self.model.add_to_replay_buffer(self.states[i], self.actions[i], rewards[i], obs[i], dones[i])
+                self.model.train()
+                self.states = obs
 
         return actions.detach().cpu().numpy().astype(int)

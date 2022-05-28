@@ -22,7 +22,7 @@ class Model:
         self.states, self.actions = None, None
         self.positions_xy = None
         self.mode = 'train'
-        self.reward_func = np.vectorize(self.reward_func)
+        self.reward_func = np.vectorize(self.get_reward)
         assert self.mode in ['train', 'inference']
         self.path = ''
 

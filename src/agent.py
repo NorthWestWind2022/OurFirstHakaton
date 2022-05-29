@@ -46,6 +46,7 @@ class Actor(torch.nn.Module):
         self.linear = torch.nn.Linear(1000, 5).to(DEVICE).double()
         self.output = torch.nn.Softmax()
         self.trainable_layers = [self.linear]
+        self.double()
 
     def forward(self, state):
         resnet_output = self.resnet(state)
@@ -67,6 +68,7 @@ class Critic(torch.nn.Module):
         self.resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True).to(DEVICE).double()
         self.linear = torch.nn.Linear(1001, 1).to(DEVICE).double()
         self.trainable_layers = [self.linear]
+        self.double()
 
     def forward(self, state, action): #добавить action
         action = action.to(DEVICE)

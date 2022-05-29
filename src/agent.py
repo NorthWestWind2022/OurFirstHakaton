@@ -180,7 +180,7 @@ class Agent:
                                         dtype=torch.float32, device=DEVICE)
         critic_loss = self.critic_loss(critic_value, target).double()
 
-        critic_loss.backward()
+        critic_loss.double().backward()
         self.critic_optimizer.step()
 
         policy_actions = torch.unsqueeze(self.actor(states), 1)

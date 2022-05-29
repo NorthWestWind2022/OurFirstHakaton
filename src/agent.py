@@ -172,11 +172,11 @@ class Agent:
         self.critic_optimizer.zero_grad()
         self.actor_optimizer.zero_grad()
 
-        target_actions = torch.unsqueeze(self.target_actor(new_states), 1)
+        target_actions = torch.unsqueeze(self.target_actor(new_states.double()), 1)
         target_critic_values = torch.squeeze(
             self.target_critic(new_states.double(), target_actions), 1
         ).detach().cpu()
-        critic_value = torch.squeeze(self.critic(states, actions), 1)
+        critic_value = torch.squeeze(self.critic(states.double(), actions), 1)
         target = rewards + torch.tensor(self.gamma * target_critic_values * (1 - done),
                                         dtype=torch.float32, device=DEVICE)
         critic_loss = self.critic_loss(critic_value.float(), target.float())

@@ -68,14 +68,13 @@ class Critic(torch.nn.Module):
         self.resnet = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True).to(DEVICE).double()
         self.linear = torch.nn.Linear(1001, 1).to(DEVICE).double()
         self.trainable_layers = [self.linear]
-        self.double()
 
     def forward(self, state, action): #добавить action
         action = action.to(DEVICE)
         resnet_res = self.resnet(state)
         concat_res = torch.concat([resnet_res, action], dim=1).to(DEVICE).double()
         q_value = self.linear(concat_res)
-        return q_value.double()
+        return q_value.float()
 
     def get_trainable_params(self):
         weights = []
@@ -165,8 +164,8 @@ class Agent:
 
         state, action, reward, new_state, done = self.replay_buffer.get_minibatch()
 
-        states = torch.tensor(state, dtype=torch.float32, device=DEVICE).double()
-        new_states = torch.tensor(new_state, dtype=torch.float32, device=DEVICE).double()
+        states = torch.tensor(state, dtype=torch.float32, device=DEVICE)
+        new_states = torch.tensor(new_state, dtype=torch.float32, device=DEVICE)
         rewards = torch.tensor(reward, dtype=torch.float32, device=DEVICE)
         actions = torch.tensor(action, dtype=torch.float32, device=DEVICE)
 
@@ -180,9 +179,9 @@ class Agent:
         critic_value = torch.squeeze(self.critic(states, actions), 1)
         target = rewards + torch.tensor(self.gamma * target_critic_values * (1 - done),
                                         dtype=torch.float32, device=DEVICE)
-        critic_loss = self.critic_loss(critic_value, target).double()
+        critic_loss = self.critic_loss(critic_value.float(), target.float())
 
-        critic_loss.double().backward()
+        critic_loss.backward()
         self.critic_optimizer.step()
 
         policy_actions = torch.unsqueeze(self.actor(states), 1)

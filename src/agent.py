@@ -105,7 +105,7 @@ class Agent:
         self.actor_optimizer = AdamW(self.actor.get_trainable_params(), lr=self.actor_lr)
         self.critic_optimizer = AdamW(self.critic.get_trainable_params(), lr=self.critic_lr)
 
-        self.critic_loss = torch.nn.MSELoss()
+        self.critic_loss = torch.nn.MSELoss().double()
 
     def update_target_networks(self, tau: float):
         actor_weights = self.actor.state_dict()

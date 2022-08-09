@@ -1,2 +1,3 @@
 # OurFirstHakaton
-Хакатон "Цифровой прорыв 2022" (Дальневосточный ФО)
+src folder - adaption of the baseline (path planning on graph + RL based on ResNet)
+source folder - actor-critic RL approach
